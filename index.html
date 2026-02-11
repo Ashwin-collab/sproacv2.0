@@ -2,237 +2,741 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SPROAC</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SPROAC - Smart Produce Monitoring</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body{
     margin:0;
-    font-family:Arial, sans-serif;
-    background:#f3f4f6;
+    font-family:Arial;
+    text-align:center;
+    color:white;
+    background:linear-gradient(270deg,#0f172a,#1e293b,#020617);
+    background-size:600% 600%;
+    animation:bgMove 12s ease infinite;
+    /* Prevent zoom and selection */
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
-/* HEADER */
-.header{
-    background:#6aa52f;
-    color:white;
-    text-align:center;
-    padding:18px;
-    font-size:22px;
+/* Prevent zoom gestures */
+* {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+@keyframes bgMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+.title{
+    font-size:70px;
+    margin-top:200px;
+    font-weight:700;
+    letter-spacing:2px;
+    background:linear-gradient(90deg,#22c55e,#4ade80,#16a34a);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:titleFade 1s ease;
+}
+
+@keyframes titleFade{
+    from{opacity:0; transform:translateY(-10px);}
+    to{opacity:1; transform:translateY(0);}
+}
+
+
+/* DATE TIME PANEL - Fixed Position */
+.datetime-box{
+    position:fixed;
+    top:70px;
+    right:20px;
+    background:#020617;
+    border:2px solid #22c55e;
+    border-radius:12px;
+    padding:12px 18px;
+    text-align:right;
+    font-size:14px;
+    box-shadow:0 0 15px rgba(34,197,94,0.6);
+    z-index:1000;
+    min-width:180px;
+}
+
+.datetime-box #day{
     font-weight:bold;
+    font-size:13px;
+    color:#4ade80;
+    margin-bottom:4px;
+}
+
+.datetime-box #date{
+    font-size:12px;
+    color:#94a3b8;
+    margin-bottom:4px;
+}
+
+.datetime-box #time{
+    font-size:16px;
+    font-weight:bold;
+    color:#22c55e;
+    margin-bottom:6px;
     letter-spacing:1px;
 }
 
-/* CARD */
-.card{
-    background:white;
-    margin:15px;
-    border-radius:14px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.1);
-    padding:15px;
-}
-
-/* BUTTON */
-.btn{
-    display:block;
-    width:90%;
-    margin:10px auto;
-    padding:12px;
-    border:none;
-    border-radius:10px;
-    background:#6aa52f;
-    color:white;
-    font-size:16px;
-    cursor:pointer;
-}
-.btn:hover{ background:#5b9128; }
-
-/* SENSOR CARDS */
-.sensor-grid{
-    display:flex;
-    justify-content:space-around;
-    flex-wrap:wrap;
-}
-
-.sensor{
-    width:30%;
-    background:#f9fafb;
-    border-radius:10px;
-    padding:10px;
-    text-align:center;
-    margin:5px;
-}
-
-.value{
-    font-size:20px;
-    font-weight:bold;
-    color:#6aa52f;
-}
-
-/* TABLE */
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-th,td{
-    border-bottom:1px solid #ddd;
-    padding:8px;
-    font-size:13px;
-}
-th{ background:#6aa52f; color:white; }
-
-.state{ display:none; }
-
-/* TOP DATETIME */
-.datetime{
-    position:absolute;
-    right:10px;
-    top:8px;
+.status-online{ 
+    color:#22c55e; 
     font-size:12px;
-    text-align:right;
+    font-weight:bold;
+}
+
+.status-offline{ 
+    color:#ef4444;
+    font-size:12px;
+    font-weight:bold;
+}
+
+/* CENTER CONTAINER FOR START STATE */
+#START {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    padding: 20px;
+}
+
+button{
+    display:block;
+    width:260px;
+    margin:10px auto;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:#1e293b;
     color:white;
+    font-size:18px;
+    cursor:pointer;
+    transition:all 0.25s ease;
+    /* Prevent text selection */
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+button:hover{ 
+    transform:scale(1.05); 
+    background:#0ea5e9; 
+}
+
+button:active{ 
+    transform:scale(0.95); 
+}
+
+.state{ 
+    display:none; 
+    animation:fadeIn 0.4s ease; 
+}
+
+@keyframes fadeIn{
+    from{opacity:0; transform:translateY(10px);}
+    to{opacity:1; transform:translateY(0);}
+}
+
+.card{
+    background:#1e293b;
+    padding:16px;
+    margin:10px auto;
+    width:260px;
+    border-radius:12px;
+    animation:cardPulse 2.5s infinite;
+}
+
+@keyframes cardPulse{
+    0%{box-shadow:0 0 0px #0ea5e9;}
+    50%{box-shadow:0 0 12px #0ea5e9;}
+    100%{box-shadow:0 0 0px #0ea5e9;}
+}
+
+.value{ 
+    font-size:24px; 
+    font-weight:bold; 
+}
+
+/* ENHANCED GRAPH CONTAINER */
+.graph-container{
+    background:#020617;
+    border:2px solid #0ea5e9;
+    border-radius:16px;
+    padding:20px;
+    margin:20px auto;
+    width:90%;
+    max-width:800px;
+    box-shadow:0 0 20px rgba(14,165,233,0.4);
+}
+
+.graph-title{
+    font-size:24px;
+    font-weight:bold;
+    color:#0ea5e9;
+    margin-bottom:15px;
+    text-align:center;
+}
+
+#gasChart{
+    max-width:100%;
+    height:auto !important;
+}
+
+table{
+    width:95%;
+    margin:auto;
+    border-collapse:collapse;
+    background:#020617;
+}
+
+th,td{ 
+    border:1px solid #334155; 
+    padding:6px; 
+}
+
+th{ 
+    background:#0ea5e9; 
+}
+
+.topBack{
+    width:100%;
+    background:#0ea5e9;
+    border-radius:0;
+    margin:0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .datetime-box{
+        top:10px;
+        right:10px;
+        font-size:11px;
+        padding:8px 12px;
+        min-width:140px;
+    }
+    
+    .datetime-box #time{
+        font-size:13px;
+    }
+    
+    .title{
+        font-size:35px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-🌱 SPROAC
-<div class="datetime">
-<div id="day"></div>
-<div id="date"></div>
-<div id="time"></div>
+<!-- DATE TIME PANEL -->
+<div class="datetime-box">
+<div id="status" class="status-online">● ONLINE</div>
+<div id="day">--</div>
+<div id="date">--</div>
+<div id="time">--</div>
 </div>
+
+<div class="title">🌱 SPROAC</div>
+<div id="clock" class="clock">--:--:--</div>
+
+<!-- START -->
+<div id="START" class="state">
+<button onclick="setState('MAIN')">📋 MAIN MENU</button>
 </div>
 
 <!-- MAIN MENU -->
 <div id="MAIN" class="state">
-<div class="card">
-<h3>Main Menu</h3>
-<button class="btn" onclick="setState('CATEGORY')">🥕 Vegetables / Fruits</button>
-<button class="btn" onclick="setState('LIVE')">📡 Live Sensors</button>
-<button class="btn" onclick="setState('LOG')">📋 All Readings</button>
-<button class="btn" onclick="setState('ABOUT')">ℹ About</button>
-</div>
-</div>
-
-<!-- CATEGORY -->
-<div id="CATEGORY" class="state">
-<div class="card">
-<h3>Select Produce</h3>
-<button class="btn" onclick="selectItem('Onion')">🧅 Onion</button>
-<button class="btn" onclick="selectItem('Garlic')">🧄 Garlic</button>
-<button class="btn" onclick="selectItem('Potato')">🥔 Potato</button>
-<button class="btn" onclick="selectItem('Tomato')">🍅 Tomato</button>
-<button class="btn" onclick="selectItem('Banana')">🍌 Banana</button>
-<button class="btn" onclick="setState('MAIN')">⬅ Back</button>
-</div>
+<button onclick="setState('CATEGORY')">🥬 Vegetables / Fruits</button>
+<button onclick="setState('GRAPH')">📊 Graphical Data</button>
+<button onclick="setState('LOG')">📝 All Readings</button>
+<button onclick="setState('HELP')">❓ Help & Support</button>
+<button onclick="setState('ABOUT')">ℹ About Us</button>
+<button onclick="setState('START')">⬅ Back</button>
 </div>
 
-<!-- LIVE SENSOR -->
-<div id="LIVE" class="state">
-<div class="card">
-<h3>Live Sensor Data</h3>
+<!-- HELP -->
+<div id="HELP" class="state">
 
-<div class="sensor-grid">
-<div class="sensor">🌡 Temp<div id="temp" class="value">--</div></div>
-<div class="sensor">💧 Humidity<div id="hum" class="value">--</div></div>
-<div class="sensor">☁ Gas<div id="gas" class="value">--</div></div>
+<button class="topBack" onclick="setState('MAIN')">⬅ Back</button>
+
+<h2>❓ Help & Support</h2>
+
+<div style="text-align:left; width:90%; margin:auto; line-height:1.6;">
+
+<h3>📘 How to Use SPROAC</h3>
+
+<p><b>Step 1:</b> Power ON the SPROAC device and ensure all sensors are properly connected.</p>
+
+<p><b>Step 2:</b> Connect the device to WiFi and wait until data begins syncing to the cloud.</p>
+
+<p><b>Step 3:</b> Open the SPROAC dashboard or application.</p>
+
+<p><b>Step 4:</b> Navigate to <b>Main Menu → Vegetables / Fruits</b>.</p>
+
+<p><b>Step 5:</b> Select the produce to monitor:</p>
+<ul>
+<li>🧅 Onion / Garlic → Uses H2S Gas Sensor</li>
+<li>🥔 Potato → Uses MQ135 Gas Sensor</li>
+<li>🍅 Tomato / 🍌 Banana → Uses Alcohol Sensor</li>
+</ul>
+
+<p><b>Step 6:</b> Monitor real-time values:</p>
+<ul>
+<li>🌡 Temperature</li>
+<li>💧 Humidity</li>
+<li>☁ Gas Level (PPM)</li>
+</ul>
+
+<p><b>Step 7:</b> If gas level rises significantly, spoilage may begin. Take corrective action.</p>
+
+<p><b>Step 8:</b> Use <b>Graphical Data</b> to observe trends over time.</p>
+
+<p><b>Step 9:</b> Use <b>All Readings</b> to view complete sensor history.</p>
+
+<hr>
+
+<h3>⚠ Troubleshooting</h3>
+
+<ul>
+<li>No data showing → Check WiFi connection</li>
+<li>Incorrect gas values → Recalibrate sensors</li>
+<li>Device offline → Verify power supply</li>
+<li>Dashboard not loading → Refresh or restart app</li>
+</ul>
+
+<hr>
+
+<h3>📞 Support</h3>
+
+<p>Email: <b>ashwinlauzer@gmail.com</b></p>
+<p>System: SPROAC Smart Monitoring</p>
+<p>Contact No: <b>+91 8610640752</b></p>
+
 </div>
 
-<button class="btn" onclick="setState('MAIN')">⬅ Back</button>
-</div>
-</div>
-
-<!-- LOG -->
-<div id="LOG" class="state">
-<div class="card">
-<h3>Sensor Log</h3>
-<table id="table">
-<thead>
-<tr><th>Date</th><th>Temp</th><th>Hum</th><th>H2S</th><th>MQ135</th><th>Alcohol</th></tr>
-</thead>
-<tbody></tbody>
-</table>
-<button class="btn" onclick="setState('MAIN')">⬅ Back</button>
-</div>
 </div>
 
 <!-- ABOUT -->
 <div id="ABOUT" class="state">
-<div class="card">
-<h3>About SPROAC</h3>
+
+<button class="topBack" onclick="setState('MAIN')">⬅ Back</button>
+
+<h2>ℹ About SPROAC</h2>
+
+<div style="text-align:left; width:90%; margin:auto; line-height:1.6;">
+
+<h3>🌱 What is SPROAC?</h3>
+
 <p>
-Smart Produce Rotting & Oxidation Alert Controller — IoT system for early spoilage detection
-using temperature, humidity, and gas sensors.
+SPROAC is an intelligent 
+IoT-based monitoring system designed to detect early spoilage in fruits and 
+vegetables using environmental and gas sensing (E-NOSE)technology. The system continuously 
+monitors storage conditions and identifies chemical changes that indicate produce 
+deterioration, helping prevent food wastage and maintain freshness.
 </p>
-<button class="btn" onclick="setState('MAIN')">⬅ Back</button>
+
+<h3>🎯 Mission</h3>
+
+<ul>
+<li>Reduce post-harvest food wastage</li>
+<li>Enable early spoilage detection</li>
+<li>Improve storage monitoring</li>
+<li>Enhance food safety & quality</li>
+<li>Support smart agriculture solutions</li>
+</ul>
+
+<h3>🔬 Technology Used</h3>
+
+<p>
+SPROAC integrates embedded hardware, gas sensing, and cloud monitoring to provide 
+real-time insights into produce freshness. The system detects biochemical gases 
+released during spoilage and alerts users before visible decay begins.
+</p>
+
+<ul>
+<li>🌡 Temperature & Humidity Monitoring</li>
+<li>☁ H2S Gas Detection – Onion & Garlic</li>
+<li>📊 MQ135 Gas Detection – Potato</li>
+<li>🍺 Alcohol / Ethylene Detection – Fruits</li>
+<li>📡 Cloud Data Logging & Visualization</li>
+</ul>
+
+<h3>⚙ Key Features</h3>
+
+<ul>
+<li>Real-time monitoring</li>
+<li>Gas-based spoilage detection</li>
+<li>Cloud data storage</li>
+<li>Graphical trend visualization</li>
+<li>Early warning alerts</li>
+<li>Low power embedded system</li>
+<li>User-friendly dashboard</li>
+</ul>
+
+<h3>🌍 Applications</h3>
+
+<ul>
+<li>Food warehouses</li>
+<li>Agricultural produce storage</li>
+<li>Smart supply chain systems</li>
+<li>Food quality monitoring</li>
+</ul>
+
+<h3>🚀 Impact</h3>
+
+<p>
+Food wastage is a major global concern. SPROAC provides an affordable and scalable 
+smart monitoring solution that helps farmers, storage facilities, and distributors 
+reduce spoilage losses and improve produce management efficiency using technology.
+</p>
+
+<h3>👨‍💻 Project Info</h3>
+
+<p>
+SPROAC is an IoT-based smart monitoring system developed for intelligent agriculture 
+and food preservation. It combines sensor analytics, embedded systems, and cloud 
+visualization into one integrated platform.
+</p>
+
+<p style="text-align:center; margin-top:20px;">
+<b>🌱 SPROAC — Smart Monitoring for Freshness, Safety & Sustainability 🌱</b>
+</p>
+
 </div>
+
+</div>
+
+<!-- CATEGORY -->
+<div id="CATEGORY" class="state">
+<button onclick="setCategory('VEG')">🥕 Vegetables</button>
+<button onclick="setCategory('FRUIT')">🍎 Fruits</button>
+<button onclick="setState('MAIN')">⬅ Back</button>
+</div>
+
+<!-- ITEM -->
+<div id="ITEM" class="state">
+<div id="itemButtons"></div>
+<button onclick="setState('CATEGORY')">⬅ Back</button>
+</div>
+
+<!-- PARAM -->
+<div id="PARAM" class="state">
+
+<div class="card">🌡 Temperature
+<div id="temp" class="value">--</div></div>
+
+<div class="card">💧 Humidity
+<div id="hum" class="value">--</div></div>
+
+<div class="card">☁ Gas Level
+<div id="gas" class="value">--</div></div>
+
+<button onclick="setState('ITEM')">⬅ Back</button>
+
+</div>
+
+<!-- GRAPH (Enhanced Styling) -->
+<div id="GRAPH" class="state">
+
+<button class="topBack" onclick="setState('MAIN')">⬅ Back</button>
+
+<div class="graph-container">
+<div class="graph-title">📊 Gas Sensor Trends</div>
+<canvas id="gasChart"></canvas>
+</div>
+
+</div>
+
+<!-- LOG (Back button TOP) -->
+<div id="LOG" class="state">
+
+<button class="topBack" onclick="setState('MAIN')">⬅ Back</button>
+
+<table id="dataTable">
+<thead>
+<tr>
+<th>Date</th>
+<th>Temp</th>
+<th>Hum</th>
+<th>H2S</th>
+<th>MQ135</th>
+<th>Alcohol</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
 </div>
 
 <script>
+
 const API_URL="https://script.google.com/macros/s/AKfycbyNjAvZGUc4VsbMXySa04ItqkSReNQMlsgtAwqRng_Y60VlRXiwIU0pjpQ3LvUxRhGCsg/exec";
 
-let currentItem="Onion";
+let currentItem="";
+let gasChart=null;
 
-/* STATE */
-function setState(s){
-document.querySelectorAll(".state").forEach(x=>x.style.display="none");
-document.getElementById(s).style.display="block";
-}
-setState("MAIN");
+// Prevent zoom on double tap
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function (event) {
+    const now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+    }
+    lastTouchEnd = now;
+}, false);
 
-/* SELECT ITEM */
-function selectItem(item){
-currentItem=item;
-setState("LIVE");
-}
-
-/* FETCH DATA */
-async function updateData(){
-try{
-const r=await fetch(API_URL);
-const d=await r.json();
-if(!d.length) return;
-const last=d[d.length-1];
-
-document.getElementById("temp").textContent=last.temperature+" °C";
-document.getElementById("hum").textContent=last.humidity+" %";
-
-let gas=(currentItem==="Potato")?last.mq135:
-(currentItem==="Tomato"||currentItem==="Banana")?last.alcohol:last.h2s;
-
-document.getElementById("gas").textContent=gas+" ppm";
-
-/* TABLE */
-const tb=document.querySelector("#table tbody");
-tb.innerHTML="";
-d.slice().reverse().forEach(r=>{
-tb.innerHTML+=`<tr><td>${r.datetime}</td><td>${r.temperature}</td><td>${r.humidity}</td><td>${r.h2s}</td><td>${r.mq135}</td><td>${r.alcohol}</td></tr>`;
+// Prevent pinch zoom
+document.addEventListener('gesturestart', function (e) {
+    e.preventDefault();
 });
 
-}catch(e){}
+document.addEventListener('gesturechange', function (e) {
+    e.preventDefault();
+});
+
+document.addEventListener('gestureend', function (e) {
+    e.preventDefault();
+});
+
+function setState(state){
+    document.querySelectorAll(".state").forEach(s=>s.style.display="none");
+    if(state === "START") {
+        document.getElementById(state).style.display="flex";
+    } else {
+        document.getElementById(state).style.display="block";
+    }
+}
+setState("START");
+
+function setCategory(cat){
+    const c=document.getElementById("itemButtons");
+    c.innerHTML="";
+    if(cat==="VEG"){
+        c.innerHTML+=`<button onclick="selectItem('Onion')">🧅 Onion</button>`;
+        c.innerHTML+=`<button onclick="selectItem('Garlic')">🧄 Garlic</button>`;
+        c.innerHTML+=`<button onclick="selectItem('Potato')">🥔 Potato</button>`;
+    }else{
+        c.innerHTML+=`<button onclick="selectItem('Tomato')">🍅 Tomato</button>`;
+        c.innerHTML+=`<button onclick="selectItem('Banana')">🍌 Banana</button>`;
+    }
+    setState("ITEM");
+}
+
+function selectItem(item){
+    currentItem=item;
+    setState("PARAM");
+}
+
+async function updateData(){
+    try{
+        const res=await fetch(API_URL);
+        const data=await res.json();
+        if(!data.length) return;
+
+        const last=data[data.length-1];
+
+        document.getElementById("temp").textContent=last.temperature+" °C";
+        document.getElementById("hum").textContent=last.humidity+" %";
+
+        let gas=0;
+        if(currentItem==="Onion"||currentItem==="Garlic") gas=last.h2s;
+        else if(currentItem==="Potato") gas=last.mq135;
+        else gas=last.alcohol;
+
+        document.getElementById("gas").textContent=gas+" ppm";
+
+        const labels=data.map(d=>d.datetime);
+        const h2s=data.map(d=>d.h2s);
+        const mq=data.map(d=>d.mq135);
+        const alc=data.map(d=>d.alcohol);
+
+        if(!gasChart){
+            const ctx=document.getElementById("gasChart").getContext("2d");
+            gasChart=new Chart(ctx,{
+                type:"line",
+                data:{
+                    labels:labels,
+                    datasets:[
+                        {
+                            label:"H2S (Onion/Garlic)",
+                            data:h2s,
+                            borderColor:"#ef4444",
+                            backgroundColor:"rgba(239,68,68,0.1)",
+                            borderWidth:3,
+                            tension:0.4,
+                            fill:true,
+                            pointRadius:4,
+                            pointHoverRadius:6,
+                            pointBackgroundColor:"#ef4444",
+                            pointBorderColor:"#fff",
+                            pointBorderWidth:2
+                        },
+                        {
+                            label:"MQ135 (Potato)",
+                            data:mq,
+                            borderColor:"#3b82f6",
+                            backgroundColor:"rgba(59,130,246,0.1)",
+                            borderWidth:3,
+                            tension:0.4,
+                            fill:true,
+                            pointRadius:4,
+                            pointHoverRadius:6,
+                            pointBackgroundColor:"#3b82f6",
+                            pointBorderColor:"#fff",
+                            pointBorderWidth:2
+                        },
+                        {
+                            label:"Alcohol (Fruits)",
+                            data:alc,
+                            borderColor:"#22c55e",
+                            backgroundColor:"rgba(34,197,94,0.1)",
+                            borderWidth:3,
+                            tension:0.4,
+                            fill:true,
+                            pointRadius:4,
+                            pointHoverRadius:6,
+                            pointBackgroundColor:"#22c55e",
+                            pointBorderColor:"#fff",
+                            pointBorderWidth:2
+                        }
+                    ]
+                },
+                options:{
+                    responsive:true,
+                    maintainAspectRatio:true,
+                    aspectRatio:2,
+                    animation:{
+                        duration:800,
+                        easing:'easeInOutQuart'
+                    },
+                    plugins:{
+                        legend:{
+                            display:true,
+                            position:'top',
+                            labels:{
+                                color:'#cbd5e1',
+                                font:{size:13, weight:'bold'},
+                                padding:15,
+                                usePointStyle:true,
+                                pointStyle:'circle'
+                            }
+                        },
+                        tooltip:{
+                            backgroundColor:'rgba(15,23,42,0.95)',
+                            titleColor:'#0ea5e9',
+                            bodyColor:'#cbd5e1',
+                            borderColor:'#0ea5e9',
+                            borderWidth:2,
+                            padding:12,
+                            displayColors:true,
+                            callbacks:{
+                                label:function(context){
+                                    return context.dataset.label+': '+context.parsed.y+' ppm';
+                                }
+                            }
+                        }
+                    },
+                    scales:{
+                        x:{
+                            ticks:{color:'#94a3b8', font:{size:11}},
+                            grid:{color:'rgba(148,163,184,0.1)'}
+                        },
+                        y:{
+                            ticks:{color:'#94a3b8', font:{size:11}},
+                            grid:{color:'rgba(148,163,184,0.2)'},
+                            beginAtZero:true
+                        }
+                    },
+                    interaction:{
+                        mode:'index',
+                        intersect:false
+                    }
+                }
+            });
+        }else{
+            gasChart.data.labels=labels;
+            gasChart.data.datasets[0].data=h2s;
+            gasChart.data.datasets[1].data=mq;
+            gasChart.data.datasets[2].data=alc;
+            gasChart.update();
+        }
+
+        const tbody=document.querySelector("#dataTable tbody");
+        tbody.innerHTML="";
+        data.slice().reverse().forEach(r=>{
+            const tr=document.createElement("tr");
+            tr.innerHTML=`<td>${r.datetime}</td>
+            <td>${r.temperature}</td>
+            <td>${r.humidity}</td>
+            <td>${r.h2s}</td>
+            <td>${r.mq135}</td>
+            <td>${r.alcohol}</td>`;
+            tbody.appendChild(tr);
+        });
+
+    }catch(e){}
 }
 setInterval(updateData,3000);
 
-/* DATE TIME */
-function updateTime(){
-const n=new Date();
-const days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+// CLOCK (Main)
+setInterval(()=>{
+    document.getElementById("clock").textContent=
+        new Date().toLocaleTimeString();
+},1000);
 
-document.getElementById("day").textContent=days[n.getDay()];
-document.getElementById("date").textContent=n.getDate()+" "+months[n.getMonth()]+" "+n.getFullYear();
-
-let h=n.getHours(),ampm=h>=12?"PM":"AM";
-h=h%12||12;
-document.getElementById("time").textContent=
-h+":"+String(n.getMinutes()).padStart(2,'0')+" "+ampm;
+// DATE TIME PANEL
+function updateDateTime(){
+    const now = new Date();
+    const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    
+    document.getElementById("day").textContent = days[now.getDay()];
+    
+    document.getElementById("date").textContent =
+        String(now.getDate()).padStart(2,'0') + " " +
+        months[now.getMonth()] + " " +
+        now.getFullYear();
+    
+    let h = now.getHours();
+    let ampm = h >= 12 ? "PM" : "AM";
+    h = h % 12;
+    h = h ? h : 12;
+    let m = String(now.getMinutes()).padStart(2,'0');
+    let s = String(now.getSeconds()).padStart(2,'0');
+    
+    document.getElementById("time").textContent =
+        h + ":" + m + ":" + s + " " + ampm;
 }
-setInterval(updateTime,1000);
-updateTime();
+
+// ONLINE / OFFLINE STATUS
+function updateStatus(){
+    const status = document.getElementById("status");
+    if(navigator.onLine){
+        status.textContent = "● ONLINE";
+        status.className = "status-online";
+    }else{
+        status.textContent = "● OFFLINE";
+        status.className = "status-offline";
+    }
+}
+
+setInterval(updateDateTime,1000);
+setInterval(updateStatus,2000);
+updateDateTime();
+updateStatus();
+
 </script>
 
 </body>
 </html>
+
+
