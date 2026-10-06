@@ -12,6 +12,19 @@
 ---
 
 ## 📌 Overview
+## 🎥 SPROAC — Working Demonstration
+
+Watch the complete demonstration of the SPROAC prototype, including sensor monitoring, spoilage detection, IoT connectivity, and system operation.
+
+<p align="center">
+  <a href="https://youtu.be/27sTv4I3YBQ?si=bwbs9ZbUWlaqHpma">
+    <img src="https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg" width="800">
+  </a>
+</p>
+
+<p align="center">
+  <b>▶ Watch SPROAC Demo on YouTube</b>
+</p>
 
 **SPROAC (Smart Produce Rotting & Oxidation Alert Controller)** is an IoT-based smart preservation and monitoring system designed to reduce post-harvest losses in agricultural produce.
 
